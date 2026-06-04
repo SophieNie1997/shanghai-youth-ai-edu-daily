@@ -155,6 +155,7 @@ curl -sS -H 'X-OpenCLI: 1' http://127.0.0.1:19825/status || true
 - 将最终日报正文保存到本项目 `reports/shanghai-youth-ai-edu-daily-YYYY-MM-DD.md`。
 - 同步更新本项目 `shanghai-youth-ai-edu-daily.md` 为当天最新版本。
 - 运行 `python3 scripts/generate_daily_site.py`，生成并刷新本项目网页日报站。
+- 网页站点校验通过后，必须把当天 Markdown 与网页产物提交并推送到 GitHub `main`，让 GitHub Pages 自动更新公网网站。
 - 站点至少要更新以下产物：
   - `index.html`
   - `daily/YYYY-MM-DD.html`
@@ -180,4 +181,7 @@ curl -sS -H 'X-OpenCLI: 1' http://127.0.0.1:19825/status || true
 2. 当天 `daily/YYYY-MM-DD.html` 已生成；
 3. `site-data/reports.json` 已更新；
 4. 首页能看到当天摘要、趋势/判断区块和历史归档入口；
-5. 不再把微信发送成功作为自动化完成条件。
+5. `git status --short` 能看到当天应发布的变更，或确认当天无新增内容；
+6. 如有变更，执行 `git add reports/shanghai-youth-ai-edu-daily-YYYY-MM-DD.md shanghai-youth-ai-edu-daily.md index.html daily/YYYY-MM-DD.html site-data/reports.json assets/site.css`，再提交：`git commit -m "chore: publish daily report YYYY-MM-DD"`；
+7. 提交后执行 `git push origin main`。如果 push 因 GitHub 凭证、网络或远端权限失败，不要说网站已更新，只能说“本地日报和网页已生成，GitHub Pages 发布被推送失败阻塞”，并给出失败命令与错误摘要；
+8. 不再把微信发送成功作为自动化完成条件。
