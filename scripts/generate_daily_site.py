@@ -92,13 +92,21 @@ def extract_numbered_items(text: str) -> list[str]:
     return items
 
 
-def collect_reports(reports_dir: Path) -> list[Report]:
-    reports = [parse_report(path) for path in sorted(reports_dir.glob("shanghai-youth-ai-edu-daily-*.md"))]
-    return sorted(reports, key=lambda report: report.date, reverse=True)
+def collect_reports(root: Path) -> list[Report]:
+    paths = [
+        *sorted((root / "reports").glob("shanghai-youth-ai-edu-daily-*.md")),
+        *sorted(root.glob("shanghai-youth-ai-edu-daily-*.md")),
+        *sorted(root.glob("shanghai-youth-ai-edu-*.md")),
+    ]
+    reports_by_date: dict[str, Report] = {}
+    for path in paths:
+        report = parse_report(path)
+        reports_by_date.setdefault(report.date, report)
+    return sorted(reports_by_date.values(), key=lambda report: report.date, reverse=True)
 
 
 def build_site(root: Path) -> None:
-    reports = collect_reports(root / "reports")
+    reports = collect_reports(root)
     if not reports:
         raise ValueError("No reports found in reports/")
     assets_dir = root / "assets"

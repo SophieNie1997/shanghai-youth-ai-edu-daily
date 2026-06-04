@@ -90,6 +90,26 @@ class BuildSiteTests(unittest.TestCase):
             data = json.loads((root / "site-data" / "reports.json").read_text(encoding="utf-8"))
             self.assertEqual(data[0]["date"], "2026-06-04")
 
+    def test_build_site_includes_legacy_root_reports(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            reports_dir = root / "reports"
+            reports_dir.mkdir()
+            (reports_dir / "shanghai-youth-ai-edu-daily-2026-06-04.md").write_text(
+                "上海青少年AI教育情报 2026-06-04\n\n今日结论\n1. 最新日报判断。\n\n渠道覆盖与失败说明\n1. 说明。\n",
+                encoding="utf-8",
+            )
+            (root / "shanghai-youth-ai-edu-2026-05-28.md").write_text(
+                "# 上海青少年AI教育情报 2026-05-28\n\n## 今日结论\n1. 早期根目录日报判断。\n\n## 渠道覆盖与失败说明\n1. 说明。\n",
+                encoding="utf-8",
+            )
+
+            build_site(root)
+
+            self.assertTrue((root / "daily" / "2026-05-28.html").exists())
+            data = json.loads((root / "site-data" / "reports.json").read_text(encoding="utf-8"))
+            self.assertEqual([item["date"] for item in data], ["2026-06-04", "2026-05-28"])
+
 
 class CliTests(unittest.TestCase):
     def test_cli_builds_site_for_current_project(self) -> None:
