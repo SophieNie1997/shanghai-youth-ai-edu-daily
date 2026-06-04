@@ -1,0 +1,1 @@
+document.documentElement.dataset.site = 'shanghai-youth-ai-edu';

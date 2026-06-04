@@ -1,0 +1,15 @@
+.DS_Store
+
+# Local brainstorming/browser session state
+.superpowers/
+
+# OpenCLI raw cache can be large, volatile, and login-state dependent.
+opencli-cache/
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+
+# Temporary files
+*.tmp
+*.temp
