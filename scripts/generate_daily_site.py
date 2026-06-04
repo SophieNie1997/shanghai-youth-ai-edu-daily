@@ -272,7 +272,7 @@ def write_homepage(path: Path, reports: list[Report]) -> None:
   <main class="page">
     <header class="hero">
       <div class="eyebrow">上海青少年 AI 教育情报</div>
-      <h1>每天一页。<br>看清上海少儿 AI 与英语市场。</h1>
+      <h1>每天一页<br>看清上海少儿 AI 与英语市场。</h1>
       <p>持续跟踪上海青少年 AI 教育、英语素质教育、财商与创业表达的市场变化，把每日判断沉淀为可阅读、可归档、可回看的研究型日报站。</p>
     </header>
 
