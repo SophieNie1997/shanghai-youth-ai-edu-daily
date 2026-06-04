@@ -272,15 +272,15 @@ def write_homepage(path: Path, reports: list[Report]) -> None:
   <main class="page">
     <header class="hero">
       <div class="eyebrow">上海青少年 AI 教育情报</div>
-      <h1>每天一页。看清上海少儿 AI 与英语市场。</h1>
+      <h1>每天一页。<br>看清上海少儿 AI 与英语市场。</h1>
       <p>持续跟踪上海青少年 AI 教育、英语素质教育、财商与创业表达的市场变化，把每日判断沉淀为可阅读、可归档、可回看的研究型日报站。</p>
     </header>
 
     <section class="feature">
       <div class="feature-copy">
         <div class="eyebrow">Latest Issue</div>
-        <h2>最新一期先给摘要，再进入完整日报详情页。</h2>
-        <p>首页只保留最值得看的判断、趋势和归档入口，完整正文、机构表、证据链接和渠道说明进入每天的独立详情页阅读。</p>
+        <h2>最新一期摘要</h2>
+        <p>摘要包含最值得看的判断、趋势和归档，完整正文、机构表、证据链接和渠道说明请进入每天的独立详情页阅读。</p>
         <ol class="bullet-list">{summary_list}</ol>
       </div>
       <aside class="summary-card">
