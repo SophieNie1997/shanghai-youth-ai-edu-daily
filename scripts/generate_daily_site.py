@@ -188,22 +188,22 @@ a:hover { text-decoration: underline; }
 .archive-item p { margin: 0; color: var(--muted); line-height: 1.6; font-size: 14px; }
 .archive-item .jump { justify-self: end; color: var(--accent); font-weight: 700; }
 .detail-hero { text-align: left; padding-top: 12px; }
-.detail-layout { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
-.toc { border-radius: 24px; padding: 18px; position: sticky; top: 18px; }
+.detail-layout { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 24px; align-items: start; }
+.toc { border-radius: 24px; padding: 18px; position: sticky; top: 18px; min-width: 0; }
 .toc h3 { margin: 0 0 12px; font-size: 18px; }
 .toc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .toc a { color: var(--muted); font-size: 14px; }
-.detail-card { border-radius: var(--radius-xl); padding: 28px; }
+.detail-card { border-radius: var(--radius-xl); padding: 28px; min-width: 0; max-width: 100%; overflow: hidden; }
 .detail-card section + section { margin-top: 28px; }
 .detail-card h2 { font-size: 28px; line-height: 1.15; letter-spacing: -0.025em; margin: 0 0 14px; }
-.detail-card p { line-height: 1.8; margin: 10px 0; }
+.detail-card p { line-height: 1.8; margin: 10px 0; overflow-wrap: anywhere; }
 .detail-card ol, .detail-card ul { padding-left: 22px; line-height: 1.8; }
-.detail-card li { margin-bottom: 8px; }
+.detail-card li { margin-bottom: 8px; overflow-wrap: anywhere; }
 .entry-card { border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; background: var(--paper-strong); margin: 14px 0; }
 .entry-card h4 { margin: 0 0 10px; font-size: 18px; }
-.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--paper-strong); }
+.table-wrap { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 20px; background: var(--paper-strong); }
 table { width: 100%; border-collapse: collapse; min-width: 860px; }
-th, td { text-align: left; vertical-align: top; padding: 14px 16px; border-top: 1px solid var(--line); line-height: 1.65; }
+th, td { text-align: left; vertical-align: top; padding: 14px 16px; border-top: 1px solid var(--line); line-height: 1.65; overflow-wrap: anywhere; }
 thead th { border-top: 0; font-size: 14px; color: var(--muted); font-weight: 700; background: rgba(255,255,255,.52); }
 .meta-list { display: grid; gap: 8px; margin: 0; }
 .meta-row { display: grid; grid-template-columns: 140px 1fr; gap: 10px; align-items: baseline; }
