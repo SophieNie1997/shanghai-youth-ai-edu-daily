@@ -341,7 +341,7 @@ def render_archive_item(report: Report) -> str:
       </div>
       <a class="jump" href="{report.detail_path}">阅读全文</a>
     </article>
-    """
+    """.strip()
 
 
 def write_detail_pages(root: Path, reports: list[Report]) -> None:
