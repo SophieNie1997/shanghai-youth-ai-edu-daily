@@ -508,7 +508,7 @@ def render_market_observations(observations: list[MarketObservation]) -> str:
     return f"""
     <section class="section market-section" id="market-observations">
       <div class="section-head">
-        <h2>市场观察贴纸</h2>
+        <h2>市场观察</h2>
         <p>把截至目前的日报判断沉淀成课程设计、产品开发和招生话术可直接使用的长期观察。</p>
       </div>
       <div class="market-board">{items}</div>
