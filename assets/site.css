@@ -55,6 +55,66 @@ a:hover { text-decoration: underline; }
 .trend-card .tag { color: var(--accent); font-size: 12px; font-weight: 700; margin-bottom: 10px; }
 .trend-card h3 { font-size: 25px; line-height: 1.18; letter-spacing: -0.025em; margin: 0 0 10px; }
 .trend-card p { color: var(--muted); font-size: 15px; line-height: 1.68; margin: 0; }
+.market-section { position: relative; }
+.insight-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.insight-sticker {
+  --sticker-bg: rgba(255, 248, 209, 0.86);
+  --sticker-accent: #a95a2a;
+  background: linear-gradient(180deg, var(--sticker-bg), rgba(255, 255, 255, 0.62));
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 8px;
+  box-shadow: 0 18px 46px rgba(66, 50, 33, 0.12);
+  backdrop-filter: blur(12px);
+  min-height: 230px;
+  overflow: hidden;
+  transform: rotate(-1deg);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.insight-sticker:nth-child(2) { --sticker-bg: rgba(232, 244, 236, 0.88); --sticker-accent: #3f7a5d; transform: rotate(0.8deg); }
+.insight-sticker:nth-child(3) { --sticker-bg: rgba(232, 240, 249, 0.9); --sticker-accent: #426f9f; transform: rotate(-0.6deg); }
+.insight-sticker:nth-child(4) { --sticker-bg: rgba(249, 233, 225, 0.9); --sticker-accent: #a75643; transform: rotate(0.5deg); }
+.insight-sticker:nth-child(5) { --sticker-bg: rgba(239, 237, 255, 0.9); --sticker-accent: #6558a6; transform: rotate(-0.8deg); }
+.insight-sticker:nth-child(6) { --sticker-bg: rgba(235, 247, 238, 0.9); --sticker-accent: #5d7741; transform: rotate(0.4deg); }
+.insight-sticker:hover, .insight-sticker[open] { transform: translateY(-2px) rotate(0deg); box-shadow: 0 22px 54px rgba(66, 50, 33, 0.16); }
+.insight-sticker summary {
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  min-height: 230px;
+  padding: 18px;
+  list-style: none;
+}
+.insight-sticker summary::-webkit-details-marker { display: none; }
+.sticker-label {
+  justify-self: start;
+  color: var(--sticker-accent);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 9px;
+}
+.sticker-title { display: block; font-size: 22px; line-height: 1.22; font-weight: 800; overflow-wrap: anywhere; }
+.sticker-brief { display: block; color: #4f4a43; font-size: 15px; line-height: 1.62; overflow-wrap: anywhere; }
+.sticker-toggle { align-self: end; color: var(--sticker-accent); font-size: 13px; font-weight: 700; }
+.insight-sticker[open] summary { min-height: auto; border-bottom: 1px solid rgba(33, 28, 22, 0.08); }
+.insight-sticker[open] .sticker-toggle::after { content: "已展开"; margin-left: 8px; color: var(--muted); font-weight: 600; }
+.sticker-detail { padding: 16px 18px 18px; }
+.sticker-detail p { margin: 0 0 12px; color: #3e3932; font-size: 14px; line-height: 1.72; overflow-wrap: anywhere; }
+.sticker-use-cases { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.sticker-use-cases span {
+  border: 1px solid rgba(33, 28, 22, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  color: #4a453e;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+.sticker-detail h4 { margin: 14px 0 6px; font-size: 14px; color: var(--sticker-accent); }
+.sticker-detail ul { margin: 0; padding-left: 18px; color: #4f4a43; font-size: 13px; line-height: 1.68; }
+.sticker-detail li { margin-bottom: 4px; overflow-wrap: anywhere; }
 .archive-wrap { border-radius: var(--radius-xl); overflow: hidden; }
 .archive-item { display: grid; grid-template-columns: 120px 1fr 110px; gap: 18px; padding: 20px 24px; border-top: 1px solid var(--line); align-items: center; }
 .archive-item:first-child { border-top: 0; }
@@ -88,8 +148,15 @@ thead th { border-top: 0; font-size: 14px; color: var(--muted); font-weight: 700
 .small-note { color: var(--muted); font-size: 13px; line-height: 1.6; }
 code { background: rgba(255,255,255,.7); border-radius: 8px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
 @media (max-width: 900px) {
-  .feature, .detail-layout, .trend-grid, .archive-item, .meta-row { grid-template-columns: 1fr; }
+  .feature, .detail-layout, .trend-grid, .insight-grid, .archive-item, .meta-row { grid-template-columns: 1fr; }
+  .hero h1 { font-size: clamp(34px, 11vw, 46px); line-height: 1.08; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+  .hero p { font-size: 16px; overflow-wrap: anywhere; }
+  .feature { padding: 20px; }
+  .feature-copy h2 { font-size: 30px; }
+  .summary-card .claim { font-size: 23px; overflow-wrap: anywhere; }
+  .insight-sticker { transform: none; min-height: auto; }
+  .insight-sticker summary { min-height: 0; }
   .archive-item .jump { justify-self: start; }
   .toc { position: static; }
-  .page { width: min(100vw - 20px, 1120px); padding-top: 24px; }
+  .page { width: min(1120px, calc(100vw - 20px)); padding-top: 24px; }
 }

@@ -35,6 +35,17 @@ class Report:
     source_path: str
 
 
+@dataclass(frozen=True)
+class MarketObservation:
+    label: str
+    title: str
+    brief: str
+    detail: str
+    use_cases: list[str]
+    actions: list[str]
+    evidence: list[str]
+
+
 def parse_report(path: Path) -> Report:
     text = path.read_text(encoding="utf-8").strip()
     lines = text.splitlines()
@@ -180,6 +191,66 @@ a:hover { text-decoration: underline; }
 .trend-card .tag { color: var(--accent); font-size: 12px; font-weight: 700; margin-bottom: 10px; }
 .trend-card h3 { font-size: 25px; line-height: 1.18; letter-spacing: -0.025em; margin: 0 0 10px; }
 .trend-card p { color: var(--muted); font-size: 15px; line-height: 1.68; margin: 0; }
+.market-section { position: relative; }
+.insight-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.insight-sticker {
+  --sticker-bg: rgba(255, 248, 209, 0.86);
+  --sticker-accent: #a95a2a;
+  background: linear-gradient(180deg, var(--sticker-bg), rgba(255, 255, 255, 0.62));
+  border: 1px solid rgba(255, 255, 255, 0.52);
+  border-radius: 8px;
+  box-shadow: 0 18px 46px rgba(66, 50, 33, 0.12);
+  backdrop-filter: blur(12px);
+  min-height: 230px;
+  overflow: hidden;
+  transform: rotate(-1deg);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.insight-sticker:nth-child(2) { --sticker-bg: rgba(232, 244, 236, 0.88); --sticker-accent: #3f7a5d; transform: rotate(0.8deg); }
+.insight-sticker:nth-child(3) { --sticker-bg: rgba(232, 240, 249, 0.9); --sticker-accent: #426f9f; transform: rotate(-0.6deg); }
+.insight-sticker:nth-child(4) { --sticker-bg: rgba(249, 233, 225, 0.9); --sticker-accent: #a75643; transform: rotate(0.5deg); }
+.insight-sticker:nth-child(5) { --sticker-bg: rgba(239, 237, 255, 0.9); --sticker-accent: #6558a6; transform: rotate(-0.8deg); }
+.insight-sticker:nth-child(6) { --sticker-bg: rgba(235, 247, 238, 0.9); --sticker-accent: #5d7741; transform: rotate(0.4deg); }
+.insight-sticker:hover, .insight-sticker[open] { transform: translateY(-2px) rotate(0deg); box-shadow: 0 22px 54px rgba(66, 50, 33, 0.16); }
+.insight-sticker summary {
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  min-height: 230px;
+  padding: 18px;
+  list-style: none;
+}
+.insight-sticker summary::-webkit-details-marker { display: none; }
+.sticker-label {
+  justify-self: start;
+  color: var(--sticker-accent);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.64);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 9px;
+}
+.sticker-title { display: block; font-size: 22px; line-height: 1.22; font-weight: 800; overflow-wrap: anywhere; }
+.sticker-brief { display: block; color: #4f4a43; font-size: 15px; line-height: 1.62; overflow-wrap: anywhere; }
+.sticker-toggle { align-self: end; color: var(--sticker-accent); font-size: 13px; font-weight: 700; }
+.insight-sticker[open] summary { min-height: auto; border-bottom: 1px solid rgba(33, 28, 22, 0.08); }
+.insight-sticker[open] .sticker-toggle::after { content: "已展开"; margin-left: 8px; color: var(--muted); font-weight: 600; }
+.sticker-detail { padding: 16px 18px 18px; }
+.sticker-detail p { margin: 0 0 12px; color: #3e3932; font-size: 14px; line-height: 1.72; overflow-wrap: anywhere; }
+.sticker-use-cases { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.sticker-use-cases span {
+  border: 1px solid rgba(33, 28, 22, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.52);
+  color: #4a453e;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+.sticker-detail h4 { margin: 14px 0 6px; font-size: 14px; color: var(--sticker-accent); }
+.sticker-detail ul { margin: 0; padding-left: 18px; color: #4f4a43; font-size: 13px; line-height: 1.68; }
+.sticker-detail li { margin-bottom: 4px; overflow-wrap: anywhere; }
 .archive-wrap { border-radius: var(--radius-xl); overflow: hidden; }
 .archive-item { display: grid; grid-template-columns: 120px 1fr 110px; gap: 18px; padding: 20px 24px; border-top: 1px solid var(--line); align-items: center; }
 .archive-item:first-child { border-top: 0; }
@@ -213,10 +284,17 @@ thead th { border-top: 0; font-size: 14px; color: var(--muted); font-weight: 700
 .small-note { color: var(--muted); font-size: 13px; line-height: 1.6; }
 code { background: rgba(255,255,255,.7); border-radius: 8px; padding: 1px 6px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .92em; }
 @media (max-width: 900px) {
-  .feature, .detail-layout, .trend-grid, .archive-item, .meta-row { grid-template-columns: 1fr; }
+  .feature, .detail-layout, .trend-grid, .insight-grid, .archive-item, .meta-row { grid-template-columns: 1fr; }
+  .hero h1 { font-size: clamp(34px, 11vw, 46px); line-height: 1.08; letter-spacing: -0.02em; overflow-wrap: anywhere; }
+  .hero p { font-size: 16px; overflow-wrap: anywhere; }
+  .feature { padding: 20px; }
+  .feature-copy h2 { font-size: 30px; }
+  .summary-card .claim { font-size: 23px; overflow-wrap: anywhere; }
+  .insight-sticker { transform: none; min-height: auto; }
+  .insight-sticker summary { min-height: 0; }
   .archive-item .jump { justify-self: start; }
   .toc { position: static; }
-  .page { width: min(100vw - 20px, 1120px); padding-top: 24px; }
+  .page { width: min(1120px, calc(100vw - 20px)); padding-top: 24px; }
 }
 """
     js = """document.documentElement.dataset.site = 'shanghai-youth-ai-edu';"""
@@ -248,6 +326,7 @@ def write_json_index(path: Path, reports: list[Report]) -> None:
 def write_homepage(path: Path, reports: list[Report]) -> None:
     latest = reports[0]
     trends = build_trends(reports[:5])
+    market_observations = render_market_observations(build_market_observations())
     archive_items = "\n".join(render_archive_item(report) for report in reports)
     trend_cards = "\n".join(
         f"""
@@ -300,6 +379,8 @@ def write_homepage(path: Path, reports: list[Report]) -> None:
       <div class="trend-grid">{trend_cards}</div>
     </section>
 
+    {market_observations}
+
     <section class="section">
       <div class="section-head">
         <h2>历史归档</h2>
@@ -322,6 +403,138 @@ def build_trends(reports: list[Report]) -> list[tuple[str, str, str]]:
         ("产品白地", headline_from_bullet(pick_bullet(all_bullets, ["白地", "头部", "财商"])), "低龄 `AI+财商+英语表达` 还没有形成稳定头部，仍有空间做出结果更清晰的产品结构。"),
         ("竞争演化", headline_from_bullet(pick_bullet(all_bullets, ["结果物", "展示", "高客单", "创业"])), "被购买的越来越不是抽象知识点，而是商业计划书、AI 海报、路演和作品集这类可展示成果。"),
     ]
+
+
+def build_market_observations() -> list[MarketObservation]:
+    return [
+        MarketObservation(
+            label="招生卖点",
+            title="纯英语不再支撑高溢价",
+            brief="英语正在变成完成项目、协作和展示的工作语言，而不是单独的购买理由。",
+            detail="英孚、瑞思、爱贝、昂立等传统英语机构都在把英语外扩到科创、PBL、综合素养、AI智习或营地实践。樱桃图书馆不宜再卖一门英语课，而要卖孩子用英文讲清真实项目的成果。",
+            use_cases=["招生卖点", "产品开发"],
+            actions=[
+                "海报主句从学英语转为用中英双语讲清一个会被购买的点子。",
+                "每节体验课必须让英语承载任务，例如用户、价值、价格和卖点表达。",
+            ],
+            evidence=[
+                "2026-05-27: 英语机构公开口径从纯语言扩到科创、PBL和综合素养。",
+                "2026-06-03 至 2026-06-04: 爱贝AI智习中心、英孚机器人玩创和昂立综合素养持续出现。",
+            ],
+        ),
+        MarketObservation(
+            label="课程设计",
+            title="AI营地正在从工具课变成果课",
+            brief="家长更容易为作品集、路演、商业计划书、AI海报和展示现场买单。",
+            detail="复旦AI+X、上海纽约大学IMA、上海交大AI智造营、包校Young Entrepreneur等案例都把结项展示或可见作品放在前台。五日营不应做工具拼盘，而要围绕同一个项目连续产出。",
+            use_cases=["课程设计", "招生卖点"],
+            actions=[
+                "五日营固定为找需求、做品牌、算成本定价、AI生成物料、中英双语路演。",
+                "结营交付作品包、展示照片、路演视频和家长复盘单。",
+            ],
+            evidence=[
+                "2026-06-04: 高客单青少年项目把AI、创意产出和展示表达打包成结果型产品。",
+                "2026-06-12: 上海交大AI智造营、AI少年创业营和AI半日营都强调成果资产。",
+            ],
+        ),
+        MarketObservation(
+            label="产品白地",
+            title="低龄AI财商双语表达仍缺头部",
+            brief="概念已经被市场教育过，但低龄、常态化、可复购的一体化产品还没有强势定义者。",
+            detail="AI赋能财商课、AI少年创业营、AI一人公司挑战营和历史AI Business&Financial Camp说明需求存在，但公开证据多停在单次活动、高龄营或标题级营销。机会在交付定义权，不在概念首发。",
+            use_cases=["产品开发", "招生卖点"],
+            actions=[
+                "把产品命名和交付锁定为AI小小CEO中英双语路演，而不是泛AI财商课。",
+                "低龄版只保留用户、成本、定价、卖点、展示五个可感知模块。",
+            ],
+            evidence=[
+                "2026-05-27: 上海本地公开成熟的AI+财商+英语表达三合一产品仍稀缺。",
+                "2026-06-12: AI赋能财商课下沉到升三至五年级，但英文商业pitch仍未被充分占位。",
+            ],
+        ),
+        MarketObservation(
+            label="转化路径",
+            title="半日体验要做低风险闭环",
+            brief="体验日不是试听，而是让家长在半天内看到孩子完成一个微型商业成果。",
+            detail="日报反复提示体验课到短营再到长期班的路径正在趋同。体验日如果只试玩AI工具，很难支撑后续客单价；如果半天完成品牌名、用户卡、价格卡、AI海报和30秒双语介绍，就能成为五日营的强入口。",
+            use_cases=["课程设计", "招生卖点"],
+            actions=[
+                "体验日固定输出品牌名、产品卡、价格卡、AI海报、中文30秒介绍和英文30秒介绍。",
+                "现场展示用家长可拍照转发的照片墙或微型市集收尾。",
+            ],
+            evidence=[
+                "2026-05-27: 市场转化路径趋向体验课到短营到长期班或高客单方案。",
+                "2026-06-12: AI半日营和小学生CEO类内容显示低风险体验入口有传播力。",
+            ],
+        ),
+        MarketObservation(
+            label="长期班",
+            title="长期班应卖连续作品集",
+            brief="持续复购的理由不是每周学一个AI工具，而是每月都有可展示项目资产。",
+            detail="官方赛事、区域竞赛和校外展示出口正在增加，长期班可以把项目资产持续沉淀为作品集。对家长来说，孩子的项目文档、英文表达视频和成长反馈比课时数量更容易感知。",
+            use_cases=["产品开发", "课程设计"],
+            actions=[
+                "长期班按每月一个AI商业表达项目设计，而不是按工具模块排课。",
+                "每月沉淀问题地图、用户访谈、定价表、AI物料、中文表达、英文表达和复盘单。",
+            ],
+            evidence=[
+                "2026-06-10: 官方和区域AI赛事覆盖AIGC、智能体、AI工具应用等多个出口。",
+                "2026-06-12: 日报建议长期班对接WAICY、长三角AI奥林匹克和上海赛等展示出口。",
+            ],
+        ),
+        MarketObservation(
+            label="差异化",
+            title="不要硬拼机器人和名校研学",
+            brief="硬件、编程和名校地标路线拥挤且资源门槛高，低龄定位更适合表达型商业项目。",
+            detail="上海AI教育供给中已经有机器人、编程、AI智造、大学营和科创地标。樱桃图书馆更好的位置不是重资产硬件赛道，而是把商业判断、AI生成、财商决策和中英表达做成轻量但结果明确的体验。",
+            use_cases=["产品开发", "招生卖点"],
+            actions=[
+                "卖点避开机器人调试、Python深度学习和名校参观堆料。",
+                "强调会判断、会定价、会表达价值这组三件事。",
+            ],
+            evidence=[
+                "2026-06-04: 日报明确不建议跟风泛AI创业营和松散讲座包装。",
+                "2026-06-12: 日报提示不要硬跟名校研学和硬件科创堆料。",
+            ],
+        ),
+    ]
+
+
+def render_market_observations(observations: list[MarketObservation]) -> str:
+    items = "\n".join(render_market_observation(observation) for observation in observations)
+    return f"""
+    <section class="section market-section" id="market-observations">
+      <div class="section-head">
+        <h2>市场观察贴纸</h2>
+        <p>把截至目前的日报判断沉淀成课程设计、产品开发和招生话术可直接使用的长期观察。</p>
+      </div>
+      <div class="insight-grid">{items}</div>
+    </section>
+    """.strip()
+
+
+def render_market_observation(observation: MarketObservation) -> str:
+    use_cases = "".join(f"<span>{html.escape(use_case)}</span>" for use_case in observation.use_cases)
+    actions = "".join(f"<li>{linkify_inline(action)}</li>" for action in observation.actions)
+    evidence = "".join(f"<li>{linkify_inline(item)}</li>" for item in observation.evidence)
+    return f"""
+    <details class="insight-sticker">
+      <summary>
+        <span class="sticker-label">{html.escape(observation.label)}</span>
+        <span class="sticker-title">{html.escape(observation.title)}</span>
+        <span class="sticker-brief">{html.escape(observation.brief)}</span>
+        <span class="sticker-toggle">点开查看详情</span>
+      </summary>
+      <div class="sticker-detail">
+        <p>{linkify_inline(observation.detail)}</p>
+        <div class="sticker-use-cases">{use_cases}</div>
+        <h4>可落地动作</h4>
+        <ul>{actions}</ul>
+        <h4>日报依据</h4>
+        <ul>{evidence}</ul>
+      </div>
+    </details>
+    """.strip()
 
 
 def pick_bullet(bullets: list[str], keywords: list[str]) -> str:

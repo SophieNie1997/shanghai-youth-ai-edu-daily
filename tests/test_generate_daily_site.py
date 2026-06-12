@@ -5,7 +5,7 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from scripts.generate_daily_site import build_site, parse_report
+from scripts.generate_daily_site import build_market_observations, build_site, parse_report
 
 
 class ParseReportTests(unittest.TestCase):
@@ -66,6 +66,21 @@ class ParseReportTests(unittest.TestCase):
 
 
 class BuildSiteTests(unittest.TestCase):
+    def test_market_observations_cover_course_product_and_enrollment(self) -> None:
+        observations = build_market_observations()
+
+        self.assertGreaterEqual(len(observations), 5)
+        combined_use_cases = {use_case for item in observations for use_case in item.use_cases}
+        self.assertIn("课程设计", combined_use_cases)
+        self.assertIn("产品开发", combined_use_cases)
+        self.assertIn("招生卖点", combined_use_cases)
+        for observation in observations:
+            self.assertTrue(observation.title)
+            self.assertTrue(observation.brief)
+            self.assertTrue(observation.detail)
+            self.assertTrue(observation.actions)
+            self.assertTrue(observation.evidence)
+
     def test_build_site_writes_home_detail_and_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -85,8 +100,15 @@ class BuildSiteTests(unittest.TestCase):
             self.assertTrue((root / "index.html").exists())
             self.assertTrue((root / "daily" / "2026-06-04.html").exists())
             self.assertTrue((root / "site-data" / "reports.json").exists())
-            self.assertIn("最新日报判断", (root / "index.html").read_text(encoding="utf-8"))
-            self.assertIn("暖灰", (root / "assets" / "site.css").read_text(encoding="utf-8"))
+            homepage = (root / "index.html").read_text(encoding="utf-8")
+            self.assertIn("最新日报判断", homepage)
+            self.assertIn("市场观察贴纸", homepage)
+            self.assertIn('id="market-observations"', homepage)
+            self.assertGreaterEqual(homepage.count('class="insight-sticker"'), 5)
+            self.assertIn("<details", homepage)
+            css = (root / "assets" / "site.css").read_text(encoding="utf-8")
+            self.assertIn("暖灰", css)
+            self.assertIn("calc(100vw - 20px)", css)
             data = json.loads((root / "site-data" / "reports.json").read_text(encoding="utf-8"))
             self.assertEqual(data[0]["date"], "2026-06-04")
 
