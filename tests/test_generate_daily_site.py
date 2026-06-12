@@ -5,7 +5,7 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from scripts.generate_daily_site import build_market_observations, build_site, parse_report
+from scripts.generate_daily_site import Report, build_market_observations, build_site, build_trends, parse_report
 
 
 class ParseReportTests(unittest.TestCase):
@@ -66,6 +66,31 @@ class ParseReportTests(unittest.TestCase):
 
 
 class BuildSiteTests(unittest.TestCase):
+    def test_build_trends_uses_distinct_bullets_when_keywords_overlap(self) -> None:
+        reports = [
+            Report(
+                date="2026-06-12",
+                title="上海青少年AI教育情报 2026-06-12",
+                summary_bullets=[
+                    "今天最值得关注的是小红书正文级线索 AI赋能财商课 已经不只是标题：其内容明确写到项目展示和双语场景。",
+                    "上海幼少儿英语市场依旧拥挤，且头部英语机构已从语言课转向综合能力、科创、AI 或全科智习。",
+                    "高客单营地被购买的越来越不是抽象知识点，而是商业计划书、AI海报、路演和作品集这类成果。",
+                ],
+                archive_headline="",
+                archive_summary="",
+                trend_bullets=[],
+                detail_path="daily/2026-06-12.html",
+                sections={},
+                source_path="",
+            )
+        ]
+
+        trends = build_trends(reports)
+        headlines = [headline for _, headline, _ in trends]
+
+        self.assertEqual(len(headlines), len(set(headlines)))
+        self.assertIn("高客单营地", headlines[2])
+
     def test_market_observations_cover_course_product_and_enrollment(self) -> None:
         observations = build_market_observations()
 

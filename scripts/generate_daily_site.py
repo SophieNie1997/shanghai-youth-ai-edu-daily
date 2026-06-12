@@ -398,11 +398,18 @@ def write_homepage(path: Path, reports: list[Report]) -> None:
 
 def build_trends(reports: list[Report]) -> list[tuple[str, str, str]]:
     all_bullets = [bullet for report in reports for bullet in report.summary_bullets]
-    return [
-        ("市场拥挤度", headline_from_bullet(pick_bullet(all_bullets, ["拥挤", "英语"])), "家长对纯英语课程的耐心在下降，能承接项目制、综合素养和展示结果的产品更容易拿到预算。"),
-        ("产品白地", headline_from_bullet(pick_bullet(all_bullets, ["白地", "头部", "财商"])), "低龄 `AI+财商+英语表达` 还没有形成稳定头部，仍有空间做出结果更清晰的产品结构。"),
-        ("竞争演化", headline_from_bullet(pick_bullet(all_bullets, ["结果物", "展示", "高客单", "创业"])), "被购买的越来越不是抽象知识点，而是商业计划书、AI 海报、路演和作品集这类可展示成果。"),
+    used_bullets: set[str] = set()
+    trend_specs = [
+        ("市场拥挤度", ["拥挤", "英语"], "家长对纯英语课程的耐心在下降，能承接项目制、综合素养和展示结果的产品更容易拿到预算。"),
+        ("产品白地", ["白地", "头部", "财商"], "低龄 `AI+财商+英语表达` 还没有形成稳定头部，仍有空间做出结果更清晰的产品结构。"),
+        ("竞争演化", ["结果物", "作品集", "路演", "高客单", "创业", "展示"], "被购买的越来越不是抽象知识点，而是商业计划书、AI 海报、路演和作品集这类可展示成果。"),
     ]
+    trends = []
+    for tag, keywords, description in trend_specs:
+        bullet = pick_bullet(all_bullets, keywords, used_bullets)
+        used_bullets.add(bullet)
+        trends.append((tag, headline_from_bullet(bullet), description))
+    return trends
 
 
 def build_market_observations() -> list[MarketObservation]:
@@ -542,9 +549,13 @@ def join_inline_items(items: list[str]) -> str:
     return "；".join(clean_items) + "。"
 
 
-def pick_bullet(bullets: list[str], keywords: list[str]) -> str:
+def pick_bullet(bullets: list[str], keywords: list[str], used_bullets: set[str] | None = None) -> str:
+    used_bullets = used_bullets or set()
     for bullet in bullets:
-        if any(keyword in bullet for keyword in keywords):
+        if bullet not in used_bullets and any(keyword in bullet for keyword in keywords):
+            return bullet
+    for bullet in bullets:
+        if bullet not in used_bullets:
             return bullet
     return bullets[0]
 
