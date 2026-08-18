@@ -730,10 +730,40 @@ def split_numbered_blocks(content: str) -> list[str]:
 
 
 def linkify_inline(text: str) -> str:
-    escaped = html.escape(text)
-    escaped = re.sub(r"`([^`]+)`", r"<code>\1</code>", escaped)
-    url_pattern = re.compile(r"(https?://[^\s<]+)")
-    return url_pattern.sub(lambda match: f'<a href="{match.group(1)}">{match.group(1)}</a>', escaped)
+    token_pattern = re.compile(
+        r"`[^`]+`|\[[^\]]+\]\(https?://[^\s)]+\)|https?://[^\s<>]+"
+    )
+    trailing_url_punctuation = ".,;:!?，。；：！？、）)]}》】"
+    rendered: list[str] = []
+    cursor = 0
+
+    for match in token_pattern.finditer(text):
+        rendered.append(html.escape(text[cursor : match.start()]))
+        token = match.group(0)
+
+        if token.startswith("`"):
+            rendered.append(f"<code>{html.escape(token[1:-1])}</code>")
+        elif token.startswith("["):
+            markdown_match = re.fullmatch(r"\[([^\]]+)\]\((https?://[^\s)]+)\)", token)
+            if markdown_match is None:
+                rendered.append(html.escape(token))
+            else:
+                label, url = markdown_match.groups()
+                rendered.append(
+                    f'<a href="{html.escape(url, quote=True)}">{html.escape(label)}</a>'
+                )
+        else:
+            url = token.rstrip(trailing_url_punctuation)
+            punctuation = token[len(url) :]
+            if url:
+                safe_url = html.escape(url, quote=True)
+                rendered.append(f'<a href="{safe_url}">{safe_url}</a>')
+            rendered.append(html.escape(punctuation))
+
+        cursor = match.end()
+
+    rendered.append(html.escape(text[cursor:]))
+    return "".join(rendered)
 
 
 def section_id(title: str) -> str:

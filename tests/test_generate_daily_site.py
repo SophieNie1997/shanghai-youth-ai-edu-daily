@@ -5,7 +5,14 @@ import textwrap
 import unittest
 from pathlib import Path
 
-from scripts.generate_daily_site import Report, build_market_observations, build_site, build_trends, parse_report
+from scripts.generate_daily_site import (
+    Report,
+    build_market_observations,
+    build_site,
+    build_trends,
+    linkify_inline,
+    parse_report,
+)
 
 
 class ParseReportTests(unittest.TestCase):
@@ -66,6 +73,17 @@ class ParseReportTests(unittest.TestCase):
 
 
 class BuildSiteTests(unittest.TestCase):
+    def test_linkify_inline_preserves_markdown_and_bare_url_boundaries(self) -> None:
+        rendered = linkify_inline(
+            "来源：[官网](https://example.com/a?x=1&y=2)；"
+            "[PDF](https://example.com/file.pdf)。补充：https://example.com/news。"
+        )
+
+        self.assertIn('<a href="https://example.com/a?x=1&amp;y=2">官网</a>；', rendered)
+        self.assertIn('<a href="https://example.com/file.pdf">PDF</a>。', rendered)
+        self.assertIn('<a href="https://example.com/news">https://example.com/news</a>。', rendered)
+        self.assertNotIn("](<a", rendered)
+
     def test_build_trends_uses_distinct_bullets_when_keywords_overlap(self) -> None:
         reports = [
             Report(
