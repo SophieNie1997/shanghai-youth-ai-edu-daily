@@ -10,8 +10,10 @@ from scripts.generate_daily_site import (
     build_market_observations,
     build_site,
     build_trends,
+    headline_from_bullet,
     linkify_inline,
     parse_report,
+    render_catalog_section,
 )
 
 
@@ -124,6 +126,60 @@ class BuildSiteTests(unittest.TestCase):
             self.assertTrue(observation.actions)
             self.assertTrue(observation.evidence)
 
+    def test_trends_classify_claim_not_later_qualifications(self) -> None:
+        report = Report(
+            date="2026-08-31", title="上海青少年AI教育情报 2026-08-31",
+            summary_bullets=[
+                "青少年可运行AI产品与真实成交已有反例，不能单独当作白地。没有英语教学证据。",
+                "上海公共AI供给已出现创意生成与路演。不能证明付费需求。",
+                "上海幼少儿英语是选择多的市场；本轮不足以证明饱和。",
+            ],
+            archive_headline="", archive_summary="", trend_bullets=[],
+            detail_path="daily/2026-08-31.html", sections={}, source_path="",
+        )
+        trends = build_trends([report])
+        self.assertIn("幼少儿英语", trends[0][1])
+        self.assertIn("真实成交", trends[1][1])
+        self.assertIn("公共AI供给", trends[2][1])
+        self.assertTrue(all("2026-08-31" in description for _, _, description in trends))
+
+    def test_headline_does_not_reduce_to_reporting_window(self) -> None:
+        headline = headline_from_bullet(
+            "8 月 19–24 日，上海公共AI基础体验的供给持续增加，"
+            "多个区域披露教育应用方向，长期学习效果和家庭付费转化仍然需要验证。"
+        )
+        self.assertFalse(headline.startswith("8 月"))
+        self.assertIn("上海公共AI", headline)
+
+    def test_trends_do_not_relabel_unmatched_bullets(self) -> None:
+        self.assertEqual(len(build_trends([])), 3)
+        self.assertTrue(all("仍需补证" in headline for _, headline, _ in build_trends([])))
+
+    def test_catalog_keeps_source_caveats_outside_table(self) -> None:
+        rendered = render_catalog_section(
+            "以下只代表公开表述。\n\n| 品牌 | 价格 |\n| --- | --- |\n| 示例 | 未核 |\n\n"
+            "现售、实际交付、成交与效果不是同一证据等级。"
+        )
+        self.assertIn("以下只代表公开表述", rendered)
+        self.assertIn("现售、实际交付、成交与效果不是同一证据等级", rendered)
+        self.assertLess(rendered.index("以下只代表"), rendered.index("<table>"))
+        self.assertGreater(rendered.index("现售、实际交付"), rendered.index("</table>"))
+
+    def test_market_observations_do_not_claim_unverified_demand(self) -> None:
+        observations = build_market_observations()
+        copy = " ".join(
+            " ".join([item.title, item.brief, item.detail, *item.actions])
+            for item in observations
+        )
+        for unsupported_claim in [
+            "纯英语不再支撑高溢价", "说明需求存在", "就能成为五日营的强入口",
+            "家长更容易为作品集", "把产品命名和交付锁定",
+        ]:
+            self.assertNotIn(unsupported_claim, copy)
+        self.assertIn("成人帮助", copy)
+        self.assertIn("全成本利润", copy)
+        self.assertIn("仍需验证", copy)
+
     def test_build_site_writes_home_detail_and_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -142,6 +198,9 @@ class BuildSiteTests(unittest.TestCase):
 
             self.assertTrue((root / "index.html").exists())
             self.assertTrue((root / "daily" / "2026-06-04.html").exists())
+            detail = (root / "daily" / "2026-06-04.html").read_text(encoding="utf-8")
+            self.assertIn('href="2026-06-03.html"', detail)
+            self.assertNotIn('href="daily/2026-06-03.html"', detail)
             self.assertTrue((root / "site-data" / "reports.json").exists())
             homepage = (root / "index.html").read_text(encoding="utf-8")
             self.assertIn("最新日报判断", homepage)
