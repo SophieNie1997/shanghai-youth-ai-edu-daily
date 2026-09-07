@@ -205,6 +205,8 @@ class BuildSiteTests(unittest.TestCase):
             homepage = (root / "index.html").read_text(encoding="utf-8")
             self.assertIn("最新日报判断", homepage)
             self.assertIn("<h2>市场观察</h2>", homepage)
+            self.assertIn("截至2026-06-04的证据与待验证产品建议", homepage)
+            self.assertNotIn("截至2026-08-31的证据与待验证产品建议", homepage)
             self.assertNotIn("市场观察贴纸", homepage)
             self.assertIn('id="market-observations"', homepage)
             self.assertIn('class="market-board"', homepage)

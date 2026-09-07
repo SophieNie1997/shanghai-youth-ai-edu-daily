@@ -326,7 +326,7 @@ def write_json_index(path: Path, reports: list[Report]) -> None:
 def write_homepage(path: Path, reports: list[Report]) -> None:
     latest = reports[0]
     trends = build_trends(reports[:5])
-    market_observations = render_market_observations(build_market_observations())
+    market_observations = render_market_observations(build_market_observations(), latest.date)
     archive_items = "\n".join(render_archive_item(report) for report in reports)
     trend_cards = "\n".join(
         f"""
@@ -511,7 +511,7 @@ def build_market_observations() -> list[MarketObservation]:
     ]
 
 
-def render_market_observations(observations: list[MarketObservation]) -> str:
+def render_market_observations(observations: list[MarketObservation], as_of_date: str) -> str:
     items = "\n".join(
         render_market_observation(observation, index)
         for index, observation in enumerate(observations, start=1)
@@ -520,7 +520,7 @@ def render_market_observations(observations: list[MarketObservation]) -> str:
     <section class="section market-section" id="market-observations">
       <div class="section-head">
         <h2>市场观察</h2>
-        <p>截至2026-08-31的证据与待验证产品建议；招生应用前仍需核对实际交付。</p>
+        <p>截至{html.escape(as_of_date)}的证据与待验证产品建议；招生应用前仍需核对实际交付。</p>
       </div>
       <div class="market-board">{items}</div>
     </section>
