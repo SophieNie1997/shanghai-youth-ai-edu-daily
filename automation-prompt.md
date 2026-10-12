@@ -22,6 +22,14 @@
 
 只有缓存缺失、过期或全部失败时，才按下方 OpenCLI 预检逻辑尝试直接调用；若直接调用仍失败，才降级到公开网页检索。即使自动化沙箱内直接调用失败，也不要丢弃当天已生成的 `opencli-cache` 成功结果。
 
+### 小红书正文采集与签名边界
+
+- 固定入口：`python3 scripts/capture_xiaohongshu.py --date YYYY-MM-DD`。仅在按上述规则需要正式调用小红书时运行；不要再写临时脚本从脱敏缓存链接调用详情接口。
+- 脚本每次最多 3 个查询，每查询保留 8 条，仅读取前 2 条正文。搜索结果的 `explore`、`search_result`、`discovery/item` 路径均识别；带签名原链接只留在当前进程内，直接传给 `opencli xiaohongshu note`，不能先脱敏再读取。
+- JSON、stderr、清单和公开链接必须在落盘时脱敏；正文记录须有非空内容才算成功，只有标题或退出码为 0 不算正文成功。当前普通本地 launchd 的上海预抓取流程也复用此脚本。
+- 当天已有成功缓存但正文有缺口时，日常自动化继续使用缓存并如实说明缺口，不自动做探测。Sophie 明确要求修复或补抓正文时，可运行 `python3 scripts/capture_xiaohongshu.py --date YYYY-MM-DD --repair-from-cache`：仅重新获取同日最多 3 个查询的签名并读取前两条正文，保留其他渠道缓存；不运行 doctor、daemon restart 或连接探测。
+- 参数、认证、验证码或正文错误不自动重试；仅 Browser Bridge 未连接按 2、4、8 秒有界重试。对搜索摘要、正文、招生计划和交付证据分别判断。
+
 ## OpenCLI 预检与降级策略
 
 必须参考小越越项目 `/Users/sophienie/Documents/Codex/2026-05-16/codex-openclaw-weixin` 的调用方式：
