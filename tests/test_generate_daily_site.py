@@ -151,6 +151,14 @@ class BuildSiteTests(unittest.TestCase):
         self.assertFalse(headline.startswith("8 月"))
         self.assertIn("上海公共AI", headline)
 
+    def test_headline_ignores_source_url_colon(self) -> None:
+        headline = headline_from_bullet(
+            "今天最有价值的新发现，是AI商业练习开始有小样本效果研究。"
+            "研究范围有限。[论文](https://arxiv.org/html/2611.02016v1)。"
+        )
+        self.assertEqual(headline, "今天最有价值的新发现，是AI商业练习开始有小样本效果研究。")
+        self.assertNotIn("arxiv", headline)
+
     def test_trends_do_not_relabel_unmatched_bullets(self) -> None:
         self.assertEqual(len(build_trends([])), 3)
         self.assertTrue(all("仍需补证" in headline for _, headline, _ in build_trends([])))
